@@ -1,95 +1,74 @@
 @extends('layouts.master')
 @section('title')
-    {{trans('isearch::common.title')}}-{{$searchphrase}} | @parent
+  {{trans('isearch::common.title')}}-{{$searchphrase}} | @parent
 @stop
 @section('content')
 
-    <div class="page blog isearch">
-        <div class="container">
-            <div class="row">
+  <div id="pageIsearch" class="page blog isearch pt-5">
+    <div class="container">
+      <h1 class="page-header text-primary col-12">{{trans('isearch::common.search')}} "{{$searchphrase}}"</h1>
+      <br>
+      
+      <livewire:isite::filters
+        :filters="config('asgard.isearch.config.filters')"
+        :showResponsiveModal="false"
+        layout="filter-layout-2"
+      />
+    
+      <hr>
 
-                <div class="row">
-                    <div class="col-xs-12">
-                        <ol class="breadcrumb">
-                            <li><a href="/">Inicio</a></li>
-                            <li>{{trans('isearch::common.search')}} "{{$searchphrase}}"</li>
-                        </ol>
-                    </div>
-                </div>
-
-                <!-- Blog Entries Column -->
-                <div class="col-xs-12 col-md-12 category-body-1">
-
-                    <h1 class="page-header">{{trans('isearch::common.search')}} "{{$searchphrase}}"</h1>
-
-                    @if (isset($result) && !empty($result))
-                        @foreach($result as $k => $entities)
-
-                            @php $cont = 0; @endphp
-                            <h2 class="page-header">{{$entities['title']}}</h2>
-                            @foreach($entities['items'] as $result)
-                            <!-- Blog Post -->
-                                <div class="col-xs-6 col-sm-4 contend post post{{$result->id}}">
-                                    <div class="bg-imagen">
-                                        <a href="{{$result->url}}">
-                                            <img class="image img-responsive"
-                                                 src="{{url(str_replace('.jpg','_mediumThumb.jpg',$result->mainimage->path??''))}}"
-                                                 alt="{{$result->title}}"/>
-                                        </a>
-                                    </div>
-                                    <div class="content">
-                                        <a href="{{$result->url}}"><h2>{{$result->title}}</h2></a>
-                                        <p>{!! $result->summary!!}</p>
-                                        <a class="btn btn-primary post-link"
-                                           href="{{$result->url}}">{{trans('isearch::common.index.Read More')}}<span
-                                                    class="glyphicon glyphicon-chevron-right"></span></a>
-                                    </div>
-                                </div>
-                                @php $cont++; @endphp
-                                @if($cont%3==0)
-                                    <div class="clearfix" style="margin-bottom: 14px;"></div>
-                                @endif
-                                @if($cont%2==0)
-                                    <div class="clearfix visible-xs-block" style="margin-bottom: 14px;"></div>
-                                @endif
-                            @endforeach
-                            <div class="clearfix"></div>
-                            <div class="pagination paginacion-blog row">
-                                <div class="pull-right">
-                                </div>
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="error-template">
-                                    <h2 class="h1">
-                                        Oops!</h2>
-                                    <h2>
-                                        {{trans('isearch::common.index.Not Found')}} </h2>
-                                    <div class="error-details">
-                                        {{trans('isearch::common.index.Not msg')}}
-                                    </div>
-                                    <div class="error-actions">
-                                        <a href="{{url('/')}}" class="btn btn-primary btn-lg"><span
-                                                    class="glyphicon glyphicon-home"></span>
-                                            {{trans('isearch::common.index.Not btn')}} </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                </div>
-
-            </div>
-
-        </div>
-
+      <livewire:isite::items-list
+        moduleName="Isearch"
+        itemComponentName="isite::item-list"
+        itemComponentNamespace="Modules\Isite\View\Components\ItemList"
+        :configLayoutIndex="config('asgard.isearch.config.layoutIndex')"
+        :itemComponentAttributes="config('asgard.isearch.config.indexItemListAttributes')"
+        entityName="Search"
+        :showTitle="false"
+        :params="['filter' => ['withoutInternal' => true], 'take' => 12]"
+        :responsiveTopContent="['mobile'=>false,'desktop'=>false,'order'=>false]"
+      />
+      
     </div>
+    <br>
+  </div>
+@stop
+@section('scripts')
+  @parent
+  <style>
+    #pageIsearch .page-header {
+      font-size: 2rem;
+      color: var(--primary);
+    }
+    #pageIsearch .card img {
+      height: 200px;
+    }
+    #pageIsearch .card .item-title a {
+      text-decoration: none;
+    }
+    #pageIsearch .card .item-title a h3 {
+      margin-top: 5px;
+      font-size: 21px;
+    }
+    #pageIsearch .card .item-summary a {
+      text-decoration: none;
+    }
+    #pageIsearch .card .item-summary a .summary {
+      line-height: 1.4;
+    }
+    #pageIsearch .card .item-view-more-button a {
+      color: var(--primary);
+      font-size: 15px;
+      font-weight: 400;
+    }
+    #pageIsearch .card .item-view-more-button a:after {
+      margin-left: 8px;
+      color: var(--primary);
+      font: normal normal normal 14px/1 FontAwesome;
+      content: "";
+    }
+
+  </style>
 @stop
 
-@section('scripts')
-    @parent
-    <link rel="stylesheet" href="{{url('modules/isearch/css/isearch.css')}}">
-@endsection
+
